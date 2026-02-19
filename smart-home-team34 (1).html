@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Home Control System — Team 34</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #070b14;
+  --surface: #0e1422;
+  --card: #131929;
+  --card2: #1a2238;
+  --accent: #38bdf8;
+  --accent2: #818cf8;
+  --green: #34d399;
+  --red: #f87171;
+  --orange: #fb923c;
+  --yellow: #fbbf24;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --border: rgba(255,255,255,0.07);
+  --shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ── Animated bg ── */
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 80% -10%, rgba(56,189,248,.12), transparent),
+    radial-gradient(ellipse 50% 40% at -10% 80%, rgba(129,140,248,.1), transparent);
+  pointer-events:none; z-index:0;
+}
+
+/* ══ LOGIN SCREEN ══ */
+#loginScreen {
+  position:fixed; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--bg);
+  z-index:1000;
+  animation: fadeIn .4s ease;
+}
+
+.login-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 48px;
+  width: 420px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.login-logo {
+  width:64px; height:64px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius:18px;
+  display:grid; place-items:center;
+  font-size:28px;
+  margin: 0 auto 20px;
+  box-shadow: 0 0 32px rgba(56,189,248,.3);
+}
+
+.login-box h2 { font-size:22px; font-weight:700; margin-bottom:4px; }
+.login-box p { color:var(--muted); font-size:13px; margin-bottom:32px; }
+
+.input-group { margin-bottom:16px; text-align:right; }
+.input-group label { font-size:12px; color:var(--muted); display:block; margin-bottom:6px; }
+.input-group input {
+  width:100%; padding:12px 16px;
+  background:var(--card2); border:1px solid var(--border);
+  border-radius:12px; color:var(--text); font-family:inherit; font-size:14px;
+  outline:none; transition:border-color .2s;
+  direction:ltr; text-align:left;
+}
+.input-group input:focus { border-color:var(--accent); }
+
+.btn-login {
+  width:100%; padding:14px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border:none; border-radius:12px;
+  color:white; font-size:15px; font-weight:600;
+  cursor:pointer; font-family:inherit;
+  margin-top:8px;
+  transition:opacity .2s, transform .2s;
+}
+.btn-login:hover { opacity:.9; transform:translateY(-1px); }
+
+.login-hint { margin-top:20px; font-size:12px; color:var(--muted); }
+
+/* ══ SIDEBAR ══ */
+#sidebar {
+  width:240px; min-height:100vh;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  display:flex; flex-direction:column;
+  position:relative; z-index:10;
+  flex-shrink:0;
+}
+
+.sidebar-logo {
+  padding:24px 20px 20px;
+  border-bottom:1px solid var(--border);
+}
+
+.logo-row { display:flex; align-items:center; gap:12px; }
+.logo-icon {
+  width:38px; height:38px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:10px; display:grid; place-items:center; font-size:18px;
+  box-shadow:0 0 16px rgba(56,189,248,.3);
+}
+.logo-text h3 { font-size:14px; font-weight:700; }
+.logo-text span { font-size:11px; color:var(--muted); }
+
+.online-pill {
+  margin-top:12px;
+  display:flex; align-items:center; gap:6px;
+  background:rgba(52,211,153,.1);
+  border:1px solid rgba(52,211,153,.2);
+  border-radius:50px; padding:5px 12px;
+  font-size:11px; color:var(--green);
+}
+.pulse { width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite; }
+
+nav { padding:16px 12px; flex:1; }
+.nav-section { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; padding:0 8px; margin:12px 0 6px; }
+
+.nav-item {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px; border-radius:10px;
+  cursor:pointer; transition:all .2s;
+  color:var(--muted); font-size:13px; margin-bottom:2px;
+  position:relative;
+}
+.nav-item:hover { background:rgba(255,255,255,.04); color:var(--text); }
+.nav-item.active {
+  background:linear-gradient(135deg,rgba(56,189,248,.15),rgba(129,140,248,.15));
+  color:var(--accent);
+  border:1px solid rgba(56,189,248,.2);
+}
+.nav-item .icon { font-size:16px; width:20px; text-align:center; }
+.badge {
+  margin-right:auto; background:var(--red);
+  border-radius:50px; padding:1px 7px; font-size:10px; color:white; font-weight:600;
+}
+
+.sidebar-bottom {
+  padding:16px; border-top:1px solid var(--border);
+}
+.user-row {
+  display:flex; align-items:center; gap:10px;
+  padding:10px; border-radius:10px; cursor:pointer;
+  transition:background .2s;
+}
+.user-row:hover { background:rgba(255,255,255,.04); }
+.avatar {
+  width:34px; height:34px; border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:grid; place-items:center; font-size:14px; font-weight:700; color:white;
+}
+.user-info { flex:1; }
+.user-name { font-size:13px; font-weight:600; }
+.user-role { font-size:11px; color:var(--muted); }
+
+/* ══ MAIN ══ */
+#main {
+  flex:1; display:flex; flex-direction:column;
+  overflow:hidden; position:relative; z-index:1;
+}
+
+/* Topbar */
+.topbar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 28px;
+  border-bottom:1px solid var(--border);
+  background:rgba(7,11,20,.8);
+  backdrop-filter:blur(12px);
+}
+
+.page-title { font-size:18px; font-weight:700; }
+.page-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+
+.topbar-right { display:flex; align-items:center; gap:12px; }
+
+.chip {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:50px; padding:6px 14px;
+  font-size:12px; display:flex; align-items:center; gap:6px;
+}
+
+.alert-bell {
+  width:36px; height:36px; background:var(--card);
+  border:1px solid var(--border); border-radius:10px;
+  display:grid; place-items:center; cursor:pointer; font-size:16px;
+  position:relative; transition:border-color .2s;
+}
+.alert-bell:hover { border-color:var(--accent); }
+.alert-bell .notif {
+  position:absolute; top:6px; right:6px;
+  width:8px; height:8px; background:var(--red); border-radius:50%;
+  border:1.5px solid var(--bg);
+}
+
+/* Content area */
+#content {
+  flex:1; overflow-y:auto; padding:24px 28px;
+}
+
+/* ══ PAGES ══ */
+.page { display:none; animation:fadeIn .3s ease; }
+.page.active { display:block; }
+
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+
+/* ── Stats row ── */
+.stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+.stat {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:16px; padding:18px 20px;
+  position:relative; overflow:hidden;
+  transition:transform .2s;
+}
+.stat:hover { transform:translateY(-2px); }
+.stat::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,transparent,var(--c,var(--accent)),transparent);
+}
+.stat-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.8px; margin-bottom:10px; }
+.stat-val { font-size:26px; font-weight:700; color:var(--c,var(--accent)); line-height:1; }
+.stat-unit { font-size:12px; color:var(--muted); margin-top:4px; }
+.stat-icon { position:absolute; top:14px; left:14px; font-size:22px; opacity:.12; }
+
+/* ── Cards / Panels ── */
+.panel {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:16px; padding:20px;
+}
+.panel-title { font-size:14px; font-weight:600; margin-bottom:16px; }
+
+/* ── Device cards ── */
+.devices-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+
+.dev-card {
+  background:var(--card2); border:1px solid var(--border);
+  border-radius:14px; padding:16px; cursor:pointer;
+  transition:all .25s; position:relative; overflow:hidden;
+}
+.dev-card:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.4); }
+.dev-card.on {
+  border-color:rgba(56,189,248,.35);
+  background:linear-gradient(135deg,var(--card2),rgba(56,189,248,.07));
+}
+.dev-card.on::after {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(circle at top right,rgba(56,189,248,.1),transparent 60%);
+  pointer-events:none;
+}
+.dev-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
+.dev-emoji { font-size:26px; }
+.dev-name { font-size:13px; font-weight:600; margin-bottom:3px; }
+.dev-status { font-size:11px; color:var(--muted); }
+.dev-status.on { color:var(--green); }
+
+/* Toggle */
+.tog {
+  width:38px; height:20px; border-radius:20px;
+  background:var(--card); border:1px solid rgba(255,255,255,.1);
+  position:relative; cursor:pointer; transition:all .3s; flex-shrink:0;
+}
+.tog.on { background:linear-gradient(90deg,var(--accent),var(--accent2)); border-color:transparent; box-shadow:0 0 10px rgba(56,189,248,.4); }
+.tog-thumb {
+  position:absolute; top:2px; right:2px;
+  width:14px; height:14px; border-radius:50%;
+  background:white; transition:right .3s; box-shadow:0 1px 3px rgba(0,0,0,.3);
+}
+.tog.on .tog-thumb { right:calc(100% - 16px); }
+
+/* Slider */
+.dev-slider { margin-top:10px; }
+.slider-row { display:flex; justify-content:space-between; font-size:10px; color:var(--muted); margin-bottom:5px; }
+input[type=range] {
+  width:100%; -webkit-appearance:none; height:3px;
+  border-radius:3px; background:var(--card); outline:none; cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none; width:12px; height:12px; border-radius:50%;
+  background:var(--accent); box-shadow:0 0 6px rgba(56,189,248,.5);
+}
+
+/* ── Sensor cards ── */
+.sensors-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+.sensor-card {
+  background:var(--card2); border:1px solid var(--border);
+  border-radius:14px; padding:16px;
+}
+.sensor-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.sensor-emoji { font-size:22px; }
+.sensor-lbl { font-size:11px; color:var(--muted); }
+.sensor-val { font-size:28px; font-weight:700; }
+.sensor-unit { font-size:12px; color:var(--muted); }
+
+.status-badge {
+  display:inline-flex; align-items:center; gap:5px;
+  border-radius:50px; padding:4px 12px; font-size:11px; font-weight:600;
+}
+.status-badge.ok { background:rgba(52,211,153,.12); color:var(--green); border:1px solid rgba(52,211,153,.25); }
+.status-badge.warn { background:rgba(251,191,36,.12); color:var(--yellow); border:1px solid rgba(251,191,36,.25); }
+.status-badge.danger { background:rgba(248,113,113,.12); color:var(--red); border:1px solid rgba(248,113,113,.25); }
+
+/* ── Alerts ── */
+.alert-item {
+  display:flex; align-items:flex-start; gap:12px;
+  padding:14px; border-radius:12px; margin-bottom:10px;
+  border:1px solid var(--border); background:var(--card2);
+  transition:background .2s;
+}
+.alert-item:hover { background:var(--card); }
+.alert-icon { font-size:20px; flex-shrink:0; margin-top:1px; }
+.alert-body { flex:1; }
+.alert-title { font-size:13px; font-weight:600; margin-bottom:3px; }
+.alert-time { font-size:11px; color:var(--muted); }
+.alert-item.unread { border-right:3px solid var(--red); }
+.alert-item.warn.unread { border-right-color:var(--yellow); }
+.mark-btn {
+  background:none; border:1px solid var(--border); border-radius:7px;
+  padding:4px 10px; color:var(--muted); font-size:11px; cursor:pointer;
+  font-family:inherit; transition:all .2s; flex-shrink:0;
+}
+.mark-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+/* ── Logs table ── */
+.log-table { width:100%; border-collapse:collapse; font-size:12px; }
+.log-table th {
+  text-align:right; padding:10px 14px;
+  color:var(--muted); font-weight:500; font-size:11px; text-transform:uppercase; letter-spacing:.8px;
+  border-bottom:1px solid var(--border);
+}
+.log-table td { padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.04); }
+.log-table tr:hover td { background:rgba(255,255,255,.02); }
+.log-type {
+  display:inline-block; border-radius:6px; padding:2px 8px;
+  font-size:10px; font-weight:600;
+}
+.log-type.control { background:rgba(56,189,248,.12); color:var(--accent); }
+.log-type.sensor { background:rgba(52,211,153,.12); color:var(--green); }
+.log-type.alert { background:rgba(248,113,113,.12); color:var(--red); }
+.log-type.access { background:rgba(251,191,36,.12); color:var(--yellow); }
+
+/* ── Scheduler ── */
+.schedule-item {
+  display:flex; align-items:center; gap:14px;
+  padding:14px; border-radius:12px; margin-bottom:10px;
+  background:var(--card2); border:1px solid var(--border);
+}
+.sched-time { font-size:18px; font-weight:700; color:var(--accent); min-width:60px; }
+.sched-info { flex:1; }
+.sched-name { font-size:13px; font-weight:600; margin-bottom:2px; }
+.sched-days { font-size:11px; color:var(--muted); }
+.sched-action { font-size:11px; color:var(--green); margin-top:2px; }
+
+/* ── Camera ── */
+.cam-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.cam-card {
+  border-radius:14px; overflow:hidden;
+  border:1px solid var(--border); background:var(--card2);
+  cursor:pointer; transition:border-color .2s;
+}
+.cam-card:hover { border-color:rgba(56,189,248,.4); }
+.cam-view {
+  aspect-ratio:16/9;
+  background:repeating-linear-gradient(45deg,#0a0e1a 0,#0a0e1a 5px,#0e1422 5px,#0e1422 10px);
+  display:flex; align-items:center; justify-content:center;
+  position:relative;
+}
+.cam-overlay {
+  position:absolute; top:8px; right:8px;
+  display:flex; align-items:center; gap:4px;
+  background:rgba(248,113,113,.9); border-radius:5px;
+  padding:2px 7px; font-size:9px; font-weight:700; letter-spacing:.5px;
+}
+.cam-dot { width:5px;height:5px;background:white;border-radius:50%;animation:pulse 1s infinite; }
+.cam-label-bar {
+  padding:10px 14px; display:flex; justify-content:space-between; align-items:center;
+}
+.cam-name { font-size:12px; font-weight:600; }
+.cam-loc { font-size:11px; color:var(--muted); }
+
+/* ── Add schedule form ── */
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+.form-group { display:flex; flex-direction:column; gap:6px; }
+.form-group label { font-size:11px; color:var(--muted); }
+.form-group select, .form-group input {
+  background:var(--card2); border:1px solid var(--border);
+  border-radius:10px; padding:10px 14px; color:var(--text); font-family:inherit; font-size:13px; outline:none;
+  transition:border-color .2s;
+}
+.form-group select:focus, .form-group input:focus { border-color:var(--accent); }
+.btn-add {
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none; border-radius:10px; padding:10px 20px;
+  color:white; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer;
+  transition:opacity .2s;
+}
+.btn-add:hover { opacity:.85; }
+
+/* ── Section header ── */
+.sec-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+.sec-title { font-size:14px; font-weight:600; }
+.sec-action {
+  background:none; border:1px solid var(--border); border-radius:8px;
+  padding:5px 12px; color:var(--muted); font-size:11px; cursor:pointer; font-family:inherit;
+  transition:all .2s;
+}
+.sec-action:hover { border-color:var(--accent); color:var(--accent); }
+
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.mt16 { margin-top:16px; }
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">🏠</div>
+    <h2>Smart Home System</h2>
+    <p>King Abdulaziz University — Team 34</p>
+    <div class="input-group">
+      <label>اسم المستخدم</label>
+      <input type="text" id="loginUser" value="admin" placeholder="admin">
+    </div>
+    <div class="input-group">
+      <label>كلمة المرور</label>
+      <input type="password" id="loginPass" value="1234" placeholder="••••">
+    </div>
+    <button class="btn-login" onclick="doLogin()">تسجيل الدخول →</button>
+    <div class="login-hint">تجريبي: admin / 1234</div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-row">
+      <div class="logo-icon">🏠</div>
+      <div class="logo-text">
+        <h3>Smart Home</h3>
+        <span>Team 34 — EE499</span>
+      </div>
+    </div>
+    <div class="online-pill">
+      <div class="pulse"></div>
+      متصل بـ AWS Cloud
+    </div>
+  </div>
+
+  <nav>
+    <div class="nav-section">الرئيسية</div>
+    <div class="nav-item active" onclick="goPage('overview',this)">
+      <span class="icon">📊</span> نظرة عامة
+    </div>
+
+    <div class="nav-section">التحكم</div>
+    <div class="nav-item" onclick="goPage('control',this)">
+      <span class="icon">🎛️</span> التحكم بالأجهزة
+    </div>
+    <div class="nav-item" onclick="goPage('scheduler',this)">
+      <span class="icon">⏰</span> الجدولة التلقائية
+    </div>
+
+    <div class="nav-section">المراقبة</div>
+    <div class="nav-item" onclick="goPage('monitoring',this)">
+      <span class="icon">📡</span> مراقبة الحساسات
+    </div>
+    <div class="nav-item" onclick="goPage('cameras',this)">
+      <span class="icon">📹</span> الكاميرات (ESP32-CAM)
+    </div>
+
+    <div class="nav-section">الأمان</div>
+    <div class="nav-item" onclick="goPage('alerts',this)">
+      <span class="icon">🚨</span> التنبيهات
+      <span class="badge" id="alertBadge">3</span>
+    </div>
+    <div class="nav-item" onclick="goPage('logs',this)">
+      <span class="icon">📋</span> سجل الأحداث
+    </div>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="user-row" onclick="doLogout()">
+      <div class="avatar">م</div>
+      <div class="user-info">
+        <div class="user-name">محمد الأدمن</div>
+        <div class="user-role">تسجيل خروج ↩</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title" id="pageTitle">نظرة عامة</div>
+      <div class="page-sub">Cloud-Centric Architecture • MQTT over TLS • ESP32</div>
+    </div>
+    <div class="topbar-right">
+      <div class="chip">🌡️ <span id="tempChip">22°م داخلي</span></div>
+      <div class="chip">⚡ <span>4.2 kWh</span></div>
+      <div class="alert-bell" onclick="goPage('alerts',null)">
+        🔔 <div class="notif"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="content">
+
+    <!-- ══ OVERVIEW PAGE ══ -->
+    <div class="page active" id="page-overview">
+      <div class="stats-row">
+        <div class="stat" style="--c:var(--green)">
+          <div class="stat-icon">📱</div>
+          <div class="stat-label">أجهزة نشطة</div>
+          <div class="stat-val" id="activeDevCount">5</div>
+          <div class="stat-unit">من أصل 8 أجهزة</div>
+        </div>
+        <div class="stat" style="--c:var(--accent)">
+          <div class="stat-icon">🌡️</div>
+          <div class="stat-label">درجة الحرارة</div>
+          <div class="stat-val">22°</div>
+          <div class="stat-unit">داخل المنزل</div>
+        </div>
+        <div class="stat" style="--c:var(--yellow)">
+          <div class="stat-icon">🔥</div>
+          <div class="stat-label">حساس الدخان</div>
+          <div class="stat-val" style="font-size:18px;padding-top:4px;">آمن</div>
+          <div class="stat-unit">لا توجد تنبيهات</div>
+        </div>
+        <div class="stat" style="--c:var(--red)">
+          <div class="stat-icon">🚨</div>
+          <div class="stat-label">تنبيهات غير مقروءة</div>
+          <div class="stat-val">3</div>
+          <div class="stat-unit">تحتاج مراجعة</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="sec-header">
+            <div class="sec-title">⚡ الأجهزة السريعة</div>
+            <button class="sec-action" onclick="goPage('control',null)">عرض الكل</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;" id="quickDevices"></div>
+        </div>
+        <div>
+          <div class="sec-header">
+            <div class="sec-title">📡 حالة الحساسات</div>
+            <button class="sec-action" onclick="goPage('monitoring',null)">تفاصيل</button>
+          </div>
+          <div class="sensors-grid" id="overviewSensors"></div>
+        </div>
+      </div>
+
+      <div class="mt16">
+        <div class="sec-header">
+          <div class="sec-title">🚨 آخر التنبيهات</div>
+          <button class="sec-action" onclick="goPage('alerts',null)">كل التنبيهات</button>
+        </div>
+        <div id="overviewAlerts"></div>
+      </div>
+    </div>
+
+    <!-- ══ CONTROL PAGE ══ -->
+    <div class="page" id="page-control">
+      <div class="sec-header">
+        <div class="sec-title">🎛️ التحكم بالأجهزة — ESP32 عبر MQTT</div>
+        <button class="sec-action" onclick="allOff()">إيقاف الكل</button>
+      </div>
+      <div class="devices-grid" id="devicesGrid"></div>
+    </div>
+
+    <!-- ══ SCHEDULER PAGE ══ -->
+    <div class="page" id="page-scheduler">
+      <div class="grid-2" style="align-items:start">
+        <div>
+          <div class="sec-header">
+            <div class="sec-title">⏰ جداول مفعّلة</div>
+          </div>
+          <div id="scheduleList"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">➕ إضافة جدول جديد</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>الجهاز</label>
+              <select id="sDevice">
+                <option>الإضاءة الرئيسية</option>
+                <option>المروحة</option>
+                <option>قفل الباب</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>الإجراء</label>
+              <select id="sAction">
+                <option>تشغيل</option>
+                <option>إيقاف</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>الوقت</label>
+              <input type="time" id="sTime" value="07:00">
+            </div>
+            <div class="form-group">
+              <label>الأيام</label>
+              <select id="sDays">
+                <option>كل يوم</option>
+                <option>أيام الأسبوع</option>
+                <option>عطلة نهاية الأسبوع</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-add" onclick="addSchedule()">إضافة الجدول</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MONITORING PAGE ══ -->
+    <div class="page" id="page-monitoring">
+      <div class="sec-header">
+        <div class="sec-title">📡 قراءات الحساسات — تحديث فوري</div>
+        <div class="chip" style="font-size:11px">تأخير: ≤5 ث • MQTT</div>
+      </div>
+      <div class="sensors-grid" style="grid-template-columns:repeat(3,1fr)" id="allSensors"></div>
+    </div>
+
+    <!-- ══ CAMERAS PAGE ══ -->
+    <div class="page" id="page-cameras">
+      <div class="sec-header">
+        <div class="sec-title">📹 كاميرات ESP32-CAM — بث مباشر</div>
+        <div class="chip" style="font-size:11px">ISO/IEC 14496 • IEEE 802.11</div>
+      </div>
+      <div style="max-width:600px">
+        <div class="cam-card">
+          <div class="cam-view" style="aspect-ratio:16/9;position:relative">
+            <div style="font-size:54px;opacity:.1;position:absolute">📷</div>
+            <div class="cam-overlay"><div class="cam-dot"></div>مباشر</div>
+            <!-- Fake scan line effect -->
+            <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(56,189,248,.015) 3px,rgba(56,189,248,.015) 4px);pointer-events:none"></div>
+            <!-- Corner brackets -->
+            <div style="position:absolute;top:12px;right:12px;width:20px;height:20px;border-top:2px solid var(--accent);border-right:2px solid var(--accent);border-radius:0 4px 0 0"></div>
+            <div style="position:absolute;top:12px;left:12px;width:20px;height:20px;border-top:2px solid var(--accent);border-left:2px solid var(--accent);border-radius:4px 0 0 0"></div>
+            <div style="position:absolute;bottom:12px;right:12px;width:20px;height:20px;border-bottom:2px solid var(--accent);border-right:2px solid var(--accent);border-radius:0 0 4px 0"></div>
+            <div style="position:absolute;bottom:12px;left:12px;width:20px;height:20px;border-bottom:2px solid var(--accent);border-left:2px solid var(--accent);border-radius:0 0 0 4px"></div>
+          </div>
+          <div class="cam-label-bar" style="padding:16px 18px">
+            <div>
+              <div class="cam-name" style="font-size:15px">🚪 الباب الرئيسي</div>
+              <div class="cam-loc" style="margin-top:3px">ESP32-CAM • IEEE 802.11 • ISO/IEC 14496</div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="sec-action" style="font-size:11px" onclick="takeSS()">📸 لقطة</button>
+              <button class="btn-add" style="font-size:12px;padding:7px 16px" onclick="openDoor()">🔓 فتح الباب</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Door status -->
+        <div class="panel" style="margin-top:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:13px;font-weight:600;margin-bottom:4px">حالة القفل الذكي</div>
+              <div id="doorStatusTxt" style="font-size:12px;color:var(--green)">🔐 مغلق — آمن</div>
+            </div>
+            <span class="status-badge ok" id="doorBadge">مغلق</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ALERTS PAGE ══ -->
+    <div class="page" id="page-alerts">
+      <div class="sec-header">
+        <div class="sec-title">🚨 التنبيهات — استجابة ≤5 ثوانٍ</div>
+        <button class="sec-action" onclick="markAllRead()">تحديد الكل كمقروء</button>
+      </div>
+      <div id="alertsList"></div>
+    </div>
+
+    <!-- ══ LOGS PAGE ══ -->
+    <div class="page" id="page-logs">
+      <div class="sec-header">
+        <div class="sec-title">📋 سجل الأحداث — Cloud Database</div>
+        <div class="chip" style="font-size:11px">تأخير الإدخال: ≤1 ثانية</div>
+      </div>
+      <div class="panel">
+        <table class="log-table">
+          <thead>
+            <tr>
+              <th>الوقت</th>
+              <th>النوع</th>
+              <th>الجهاز</th>
+              <th>الإجراء</th>
+              <th>المستخدم</th>
+            </tr>
+          </thead>
+          <tbody id="logsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+// ─────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────
+const devices = [
+  { id:0, name:'الإضاءة الرئيسية', emoji:'💡', on:true,  hasSlider:true,  sliderLabel:'السطوع', sliderVal:75, status:'75%', pin:'GPIO2' },
+  { id:1, name:'المروحة',          emoji:'🌀', on:true,  hasSlider:true,  sliderLabel:'السرعة',  sliderVal:60, status:'60%', pin:'GPIO4' },
+  { id:2, name:'قفل الباب',        emoji:'🔐', on:true,  hasSlider:false, sliderLabel:'',        sliderVal:0,  status:'مغلق • آمن', pin:'GPIO5' },
+  { id:3, name:'إضاءة المطبخ',    emoji:'💡', on:false, hasSlider:true,  sliderLabel:'السطوع', sliderVal:100,status:'مطفأ', pin:'GPIO12' },
+  { id:4, name:'إضاءة الحديقة',   emoji:'🌟', on:false, hasSlider:true,  sliderLabel:'السطوع', sliderVal:50, status:'مطفأ', pin:'GPIO13' },
+  { id:5, name:'مضخة الري',       emoji:'💧', on:false, hasSlider:false, sliderLabel:'',        sliderVal:0,  status:'مطفأ', pin:'GPIO14' },
+  { id:6, name:'مكيف الهواء',     emoji:'❄️', on:true,  hasSlider:true,  sliderLabel:'الحرارة',sliderVal:22, status:'22°م', pin:'GPIO15' },
+  { id:7, name:'مكبر الصوت',      emoji:'🔊', on:true,  hasSlider:true,  sliderLabel:'الصوت',  sliderVal:40, status:'40%', pin:'GPIO16' },
+];
+
+const sensors = [
+  { name:'حساس الدخان',   emoji:'🔥', val:'0 ppm',  unit:'آمن',    type:'smoke',    status:'ok' },
+  { name:'حساس الحركة',   emoji:'🏃', val:'لا يوجد', unit:'حركة',  type:'motion',   status:'ok' },
+  { name:'باب رئيسي',     emoji:'🚪', val:'مغلق',   unit:'مزلاج', type:'door',     status:'ok' },
+  { name:'الحرارة',        emoji:'🌡️', val:'22°',    unit:'مئوية', type:'temp',     status:'ok' },
+  { name:'الرطوبة',        emoji:'💧', val:'58%',    unit:'نسبة',  type:'humidity', status:'ok' },
+  { name:'جودة الهواء',   emoji:'🌬️', val:'جيد',    unit:'AQI',   type:'air',      status:'ok' },
+];
+
+const alerts = [
+  { id:0, title:'🚨 حركة غير معتادة عند الباب الرئيسي', time:'منذ 5 دقائق', type:'danger', read:false },
+  { id:1, title:'🔥 ارتفاع طفيف في درجة حرارة المطبخ', time:'منذ 18 دقيقة', type:'warn', read:false },
+  { id:2, title:'🔐 تمت محاولة فتح الباب 3 مرات', time:'منذ 25 دقيقة', type:'danger', read:false },
+  { id:3, title:'✅ تم تشغيل الإضاءة تلقائياً (جدول)', time:'منذ 2 ساعة', type:'ok', read:true },
+  { id:4, title:'📡 انقطاع بسيط في Wi-Fi وإعادة الاتصال', time:'منذ 3 ساعات', type:'warn', read:true },
+];
+
+const schedules = [
+  { time:'07:00', device:'الإضاءة الرئيسية', action:'تشغيل', days:'كل يوم', on:true },
+  { time:'23:00', device:'الإضاءة الرئيسية', action:'إيقاف', days:'كل يوم', on:true },
+  { time:'06:30', device:'مضخة الري', action:'تشغيل', days:'أيام الأسبوع', on:true },
+  { time:'22:30', device:'قفل الباب', action:'قفل', days:'كل يوم', on:false },
+];
+
+const logs = [
+  { time:'10:42:15', type:'control', device:'الإضاءة الرئيسية', action:'تشغيل (سطوع 75%)', user:'admin' },
+  { time:'10:38:02', type:'sensor',  device:'حساس الحركة', action:'حركة مكتشفة', user:'النظام' },
+  { time:'10:35:44', type:'alert',   device:'باب رئيسي', action:'محاولة فتح غير مصرحة', user:'النظام' },
+  { time:'10:20:10', type:'access',  device:'قفل الباب', action:'تم الفتح', user:'admin' },
+  { time:'09:55:00', type:'control', device:'المروحة', action:'تشغيل (سرعة 60%)', user:'admin' },
+  { time:'09:30:00', type:'sensor',  device:'حساس الدخان', action:'قراءة طبيعية 0 ppm', user:'النظام' },
+  { time:'08:00:00', type:'control', device:'مكيف الهواء', action:'تشغيل 22°م', user:'جدول تلقائي' },
+  { time:'07:00:00', type:'control', device:'الإضاءة الرئيسية', action:'تشغيل تلقائي', user:'جدول تلقائي' },
+];
+
+// ─────────────────────────────────────────────
+// LOGIN
+// ─────────────────────────────────────────────
+function doLogin() {
+  const u = document.getElementById('loginUser').value;
+  const p = document.getElementById('loginPass').value;
+  if (u === 'admin' && p === '1234') {
+    document.getElementById('loginScreen').style.animation = 'fadeIn .3s ease reverse';
+    setTimeout(() => document.getElementById('loginScreen').style.display = 'none', 280);
+    render();
+  } else {
+    document.getElementById('loginPass').style.borderColor = 'var(--red)';
+    setTimeout(() => document.getElementById('loginPass').style.borderColor = '', 1500);
+  }
+}
+
+function doLogout() {
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginScreen').style.animation = 'fadeIn .3s ease';
+}
+
+// ─────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────
+const titles = {
+  overview:'نظرة عامة', control:'التحكم بالأجهزة',
+  scheduler:'الجدولة التلقائية', monitoring:'مراقبة الحساسات',
+  cameras:'الكاميرات (ESP32-CAM)', alerts:'التنبيهات', logs:'سجل الأحداث'
+};
+
+function goPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (el) el.classList.add('active');
+  else {
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'"+id+"'")) n.classList.add('active');
+    });
+  }
+  document.getElementById('pageTitle').textContent = titles[id] || id;
+}
+
+// ─────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────
+function render() {
+  renderDevicesGrid();
+  renderQuickDevices();
+  renderOverviewSensors();
+  renderAllSensors();
+  renderAlerts();
+  renderOverviewAlerts();
+  renderLogs();
+  renderSchedules();
+  updateActiveCount();
+}
+
+function updateActiveCount() {
+  const c = devices.filter(d => d.on).length;
+  document.getElementById('activeDevCount').textContent = c;
+}
+
+// Devices full grid
+function renderDevicesGrid() {
+  const g = document.getElementById('devicesGrid');
+  g.innerHTML = devices.map(d => `
+    <div class="dev-card ${d.on?'on':''}" id="dcard-${d.id}" onclick="toggleDev(${d.id})">
+      <div class="dev-top">
+        <div class="dev-emoji">${d.emoji}</div>
+        <div class="tog ${d.on?'on':''}" id="dtog-${d.id}" onclick="event.stopPropagation();toggleDev(${d.id})">
+          <div class="tog-thumb"></div>
+        </div>
+      </div>
+      <div class="dev-name">${d.name}</div>
+      <div class="dev-status ${d.on?'on':''}" id="dstatus-${d.id}">${d.on?'تشغيل • '+d.status:'إيقاف'}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:3px">📍 ${d.pin}</div>
+      ${d.hasSlider && d.on ? `
+      <div class="dev-slider" onclick="event.stopPropagation()">
+        <div class="slider-row"><span>${d.sliderLabel}</span><span id="dsval-${d.id}">${d.sliderVal}${d.sliderLabel==='الحرارة'?'°':'%'}</span></div>
+        <input type="range" min="${d.sliderLabel==='الحرارة'?16:0}" max="${d.sliderLabel==='الحرارة'?30:100}" value="${d.sliderVal}"
+          oninput="updateSlider(${d.id},this.value)">
+      </div>` : ''}
+    </div>`).join('');
+}
+
+// Quick devices for overview
+function renderQuickDevices() {
+  const el = document.getElementById('quickDevices');
+  if (!el) return;
+  el.innerHTML = devices.slice(0,5).map(d => `
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--card2);border-radius:12px;border:1px solid var(--border)">
+      <span style="font-size:18px">${d.emoji}</span>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600">${d.name}</div>
+        <div style="font-size:11px;color:${d.on?'var(--green)':'var(--muted)'}">${d.on?'تشغيل':'إيقاف'}</div>
+      </div>
+      <div class="tog ${d.on?'on':''}" onclick="toggleDev(${d.id});renderQuickDevices()">
+        <div class="tog-thumb"></div>
+      </div>
+    </div>`).join('');
+}
+
+function renderOverviewSensors() {
+  const el = document.getElementById('overviewSensors');
+  if (!el) return;
+  el.innerHTML = sensors.slice(0,4).map(s => `
+    <div class="sensor-card">
+      <div class="sensor-top">
+        <span>${s.emoji}</span>
+        <span class="status-badge ${s.status}">آمن</span>
+      </div>
+      <div class="sensor-lbl">${s.name}</div>
+      <div class="sensor-val">${s.val}</div>
+      <div class="sensor-unit">${s.unit}</div>
+    </div>`).join('');
+}
+
+function renderAllSensors() {
+  const el = document.getElementById('allSensors');
+  if (!el) return;
+  el.innerHTML = sensors.map(s => `
+    <div class="sensor-card">
+      <div class="sensor-top">
+        <span style="font-size:26px">${s.emoji}</span>
+        <span class="status-badge ${s.status}">آمن</span>
+      </div>
+      <div class="sensor-lbl" style="margin-bottom:8px">${s.name}</div>
+      <div class="sensor-val">${s.val}</div>
+      <div class="sensor-unit">${s.unit}</div>
+    </div>`).join('');
+}
+
+function renderAlerts() {
+  const el = document.getElementById('alertsList');
+  if (!el) return;
+  el.innerHTML = alerts.map(a => `
+    <div class="alert-item ${a.type} ${a.read?'':'unread'}" id="alert-${a.id}">
+      <div class="alert-icon">${a.type==='danger'?'🔴':a.type==='warn'?'🟡':'🟢'}</div>
+      <div class="alert-body">
+        <div class="alert-title">${a.title}</div>
+        <div class="alert-time">🕐 ${a.time}</div>
+      </div>
+      ${!a.read?`<button class="mark-btn" onclick="markRead(${a.id})">مقروء</button>`:''}
+    </div>`).join('');
+  const unread = alerts.filter(a=>!a.read).length;
+  document.getElementById('alertBadge').textContent = unread || '';
+  document.getElementById('alertBadge').style.display = unread ? 'block' : 'none';
+}
+
+function renderOverviewAlerts() {
+  const el = document.getElementById('overviewAlerts');
+  if (!el) return;
+  el.innerHTML = alerts.slice(0,3).map(a => `
+    <div class="alert-item ${a.type} ${a.read?'':'unread'}" style="margin-bottom:8px">
+      <div class="alert-icon">${a.type==='danger'?'🔴':a.type==='warn'?'🟡':'🟢'}</div>
+      <div class="alert-body">
+        <div class="alert-title">${a.title}</div>
+        <div class="alert-time">${a.time}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderLogs() {
+  const el = document.getElementById('logsBody');
+  if (!el) return;
+  el.innerHTML = logs.map(l => `
+    <tr>
+      <td style="color:var(--muted)">${l.time}</td>
+      <td><span class="log-type ${l.type}">${{control:'تحكم',sensor:'حساس',alert:'تنبيه',access:'وصول'}[l.type]}</span></td>
+      <td>${l.device}</td>
+      <td>${l.action}</td>
+      <td style="color:var(--muted)">${l.user}</td>
+    </tr>`).join('');
+}
+
+function renderSchedules() {
+  const el = document.getElementById('scheduleList');
+  if (!el) return;
+  el.innerHTML = schedules.map((s,i) => `
+    <div class="schedule-item">
+      <div class="sched-time">${s.time}</div>
+      <div class="sched-info">
+        <div class="sched-name">${s.device}</div>
+        <div class="sched-days">📅 ${s.days}</div>
+        <div class="sched-action">→ ${s.action}</div>
+      </div>
+      <div class="tog ${s.on?'on':''}" onclick="toggleSched(${i})">
+        <div class="tog-thumb"></div>
+      </div>
+    </div>`).join('');
+}
+
+// ─────────────────────────────────────────────
+// ACTIONS
+// ─────────────────────────────────────────────
+function toggleDev(id) {
+  devices[id].on = !devices[id].on;
+  renderDevicesGrid();
+  renderQuickDevices();
+  updateActiveCount();
+  // Log it
+  logs.unshift({
+    time: new Date().toLocaleTimeString('ar-SA'),
+    type:'control', device:devices[id].name,
+    action: devices[id].on ? 'تشغيل' : 'إيقاف', user:'admin'
+  });
+  renderLogs();
+}
+
+function updateSlider(id, val) {
+  devices[id].sliderVal = parseInt(val);
+  const suf = devices[id].sliderLabel === 'الحرارة' ? '°' : '%';
+  const el = document.getElementById('dsval-'+id);
+  if (el) el.textContent = val + suf;
+}
+
+function allOff() {
+  devices.forEach(d => d.on = false);
+  renderDevicesGrid();
+  renderQuickDevices();
+  updateActiveCount();
+}
+
+function markRead(id) {
+  alerts[id].read = true;
+  renderAlerts();
+  renderOverviewAlerts();
+}
+
+function markAllRead() {
+  alerts.forEach(a => a.read = true);
+  renderAlerts();
+  renderOverviewAlerts();
+}
+
+function toggleSched(i) {
+  schedules[i].on = !schedules[i].on;
+  renderSchedules();
+}
+
+function addSchedule() {
+  const device = document.getElementById('sDevice').value;
+  const action = document.getElementById('sAction').value;
+  const time = document.getElementById('sTime').value;
+  const days = document.getElementById('sDays').value;
+  schedules.unshift({ time, device, action, days, on:true });
+  renderSchedules();
+}
+
+function openDoor() {
+  const btn = event.target;
+  const isOpen = btn.textContent.includes('إغلاق');
+  if (isOpen) {
+    btn.textContent = '🔓 فتح الباب';
+    btn.style.background = 'linear-gradient(135deg,var(--accent),var(--accent2))';
+    document.getElementById('doorStatusTxt').textContent = '🔐 مغلق — آمن';
+    document.getElementById('doorStatusTxt').style.color = 'var(--green)';
+    document.getElementById('doorBadge').textContent = 'مغلق';
+    document.getElementById('doorBadge').className = 'status-badge ok';
+  } else {
+    btn.textContent = '🔒 إغلاق الباب';
+    btn.style.background = 'linear-gradient(135deg,var(--orange),var(--red))';
+    document.getElementById('doorStatusTxt').textContent = '🔓 مفتوح';
+    document.getElementById('doorStatusTxt').style.color = 'var(--orange)';
+    document.getElementById('doorBadge').textContent = 'مفتوح';
+    document.getElementById('doorBadge').className = 'status-badge warn';
+  }
+  logs.unshift({ time: new Date().toLocaleTimeString('ar-SA'), type:'access', device:'قفل الباب', action: isOpen ? 'إغلاق' : 'فتح', user:'admin' });
+  renderLogs();
+}
+
+function takeSS() {
+  const btn = event.target;
+  btn.textContent = '⏳ ...';
+  setTimeout(() => { btn.textContent = '✅ تم الحفظ'; setTimeout(() => btn.textContent = '📸 لقطة', 1500); }, 800);
+  logs.unshift({ time: new Date().toLocaleTimeString('ar-SA'), type:'access', device:'ESP32-CAM', action:'التقاط لقطة', user:'admin' });
+  renderLogs();
+}
+
+// Simulate real-time MQTT updates
+setInterval(() => {
+  // Random sensor fluctuation
+  sensors[3].val = (21 + Math.random()*2).toFixed(1) + '°';
+  sensors[4].val = (55 + Math.random()*8).toFixed(0) + '%';
+  document.getElementById('tempChip').textContent = sensors[3].val + ' داخلي';
+  if (document.getElementById('page-monitoring').classList.contains('active')) renderAllSensors();
+  if (document.getElementById('page-overview').classList.contains('active')) renderOverviewSensors();
+}, 3000);
+</script>
+</body>
+</html>
